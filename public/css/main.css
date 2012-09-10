@@ -1,7 +1,7 @@
 form ul { margin: 0; padding: 0; list-style-type: none; text-indent: none; }
 form ul li { }
 
-body.loading #main-ui { opacity: 0.2; }
+body.loading #main-ui { opacity: 0.5; }
 
 #main-ui { position: relative; }
 #main-ui { width: 750px; }

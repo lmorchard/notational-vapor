@@ -22,20 +22,9 @@ var curr_note_saved = false;
 var client;
 
 function main () {
-    search_el.keyup(function () {
-        refreshNoteList();
-    });
-
-    notelist_el.click(function () {
-        loadNote(notelist_el.val());
-    });
-    
-    setInterval(function () {
-        maybeSaveNote();
-        loadNoteList(refreshNoteList);
-    }, 5000);
-
     $('body').addClass('loading');
+
+    wireupUI();
 
     client = new Dropbox.Client(conf.DROPBOX_CONF);
     client.authDriver(new Dropbox.Drivers.Redirect({
@@ -49,6 +38,30 @@ function main () {
             $('body').removeClass('loading');
         });
     });
+}
+
+function wireupUI () {
+    search_el.keyup(function (ev) {
+        if (38 == ev.keyCode) {
+            console.log("UP");
+        }
+        if (40 == ev.keyCode) {
+            console.log("DOWN");
+        }
+        refreshNoteList();
+    });
+
+    notelist_el.click(function () {
+        loadNote(notelist_el.val());
+    });
+    notelist_el.change(function () {
+        loadNote(notelist_el.val());
+    });
+    
+    setInterval(function () {
+        maybeSaveNote();
+        loadNoteList(refreshNoteList);
+    }, 5000);
 }
 
 function loadNoteList (cb) {
@@ -100,7 +113,6 @@ function loadNote (fn) {
 function maybeSaveNote () {
     var curr_note_txt = note_el.val();
     if (!saving && curr_note_saved != curr_note_txt) {
-        console.log("SAVING");
         saving = true;
         client.writeFile(curr_note_fn, curr_note_txt, function (err, stat) {
             if (err) { return; }
