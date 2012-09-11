@@ -22,3 +22,6 @@ code is here, at least!
 * save button
 * handle errors
 * search note bodies... somehow?
+* markdown preview?
+* other storage APIs
+    * s3, evernote, webdav

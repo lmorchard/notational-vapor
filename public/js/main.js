@@ -1,12 +1,9 @@
-//
-// 
-//
 (function () {
 
 var conf = {
     IDLE_TIMEOUT: 1000,
     SAVE_TIMEOUT: 2000,
-    REFRESH_TIMEOUT: 10000,
+    REFRESH_TIMEOUT: 5000,
     LOAD_SELECTION_TIMEOUT: 250,
     DROPBOX_CONF: {
         key: "361ljvjgjcxd7ci",
@@ -76,88 +73,97 @@ function wireupUI () {
     });
 
     // Capture some keypresses in the search field.
-    // search_el.keyup(function (ev) {
     search_el.keypress(function (ev) {
-        var selected = notelist_el.find('option:selected');
-
-        if (13 == ev.keyCode) { // Return key
-            var search_txt = (''+search_el.val()).toLowerCase();
-            if (!search_txt) { return; }
-
-            // Look for a pre-existing match, select if found.
-            var loaded = false;
-            notelist_el.find('option').each(function () {
-                var el = $(this);
-                var el_txt = (''+el.text()).toLowerCase();
-                if (el_txt == search_txt) {
-                    el.attr('selected', true);
-                    loaded = true;
-                    return loadSelectedNote();
-                }
-            });
-
-            // Create a blank note, if nothing loaded.
-            if (!loaded) {
-                note_el.val('');
-                curr_note_fn = search_el.val() + '.txt';
-                curr_note_saved = '';
-                note_el.focus();
-            }
-
-        } else if (38 == ev.keyCode) { // Up arrow...
-            if (0 == selected.length) {
-                // With nothing selected, the last item gets selected
-                notelist_el.find('option:last').attr('selected', true);
-            } else {
-                // Cycle up, with wraparound.
-                var el = notelist_el
-                    .find('option:selected').attr('selected', null)
-                    .prev('option');
-                if (el.length) {
-                    el.attr('selected', true);
-                } else {
-                    notelist_el.find('option:last').attr('selected', true);
-                }
-            }
-            return loadSelectedNote();
-        
-        } else if (40 == ev.keyCode) { // Down arrow...
-            if (0 == selected.length) {
-                // With nothing selected, the first item gets selected.
-                notelist_el.find('option:first').attr('selected', true);
-            } else {
-                // Cycle down, with wraparound.
-                var el = notelist_el
-                    .find('option:selected').attr('selected', null)
-                    .next('option');
-                if (el.length) {
-                    el.attr('selected', true);
-                } else {
-                    notelist_el.find('option:first').attr('selected', true);
-                }
-            }
-            return loadSelectedNote();
-        
+        if (13 == ev.keyCode) {
+            return handleSearchReturn();
+        } else if (38 == ev.keyCode) {
+            return handleSearchUpArrow();
+        } else if (40 == ev.keyCode) {
+            return handleSearchDownArrow();
         } else {
-            // Typing results in a refresh of the note list with search
-            refreshNoteList();
-            var opts = notelist_el.find('option');
-            if (opts.length == 1) {
-                opts.attr('selected', true);
-                return loadSelectedNote();
-            } else {
-                var search_txt = (''+search_el.val()).toLowerCase();
-                notelist_el.find('option').each(function () {
-                    var el = $(this);
-                    var el_txt = (''+el.text()).toLowerCase();
-                    if (el_txt == search_txt) {
-                        el.attr('selected', true);
-                        return loadSelectedNote();
-                    }
-                });
-            }
+            // Defer reaction to other search text entry, so filtering gets
+            // access to the updated text field.
+            setTimeout(handleSearchTyping, 0.1);
         }
     });
+}
+
+function handleSearchReturn () {
+    var search_txt = (''+search_el.val()).toLowerCase();
+    if (!search_txt) { return; }
+
+    // Look for a pre-existing match, ignore return if found.
+    var exists = false;
+    $.each(notes, function (idx, item) {
+        if (search_txt == item.label.toLowerCase()) {
+            exists = true;
+        }
+    });
+
+    // Create a blank note, if no pre-existing.
+    if (!exists) {
+        note_el.val('');
+        curr_note_fn = search_el.val() + '.txt';
+        curr_note_saved = '';
+        note_el.focus();
+    }
+}
+
+function handleSearchTyping () {
+    refreshNoteList();
+    var opts = notelist_el.find('option');
+    if (opts.length == 1) {
+        opts.attr('selected', true);
+        return loadSelectedNote();
+    } else {
+        var search_txt = (''+search_el.val()).toLowerCase();
+        notelist_el.find('option').each(function () {
+            var el = $(this);
+            var el_txt = (''+el.text()).toLowerCase();
+            if (el_txt == search_txt) {
+                el.attr('selected', true);
+                return loadSelectedNote();
+            }
+        });
+    }
+}
+
+function handleSearchUpArrow () {
+    var selected = notelist_el.find('option:selected');
+    if (0 == selected.length) {
+        // With nothing selected, the last item gets selected
+        notelist_el.find('option:last').attr('selected', true);
+    } else {
+        // Cycle up, with wraparound.
+        var el = notelist_el
+            .find('option:selected').attr('selected', null)
+            .prev('option');
+        if (el.length) {
+            el.attr('selected', true);
+        } else {
+            notelist_el.find('option:last').attr('selected', true);
+        }
+    }
+    return loadSelectedNote();
+}
+
+function handleSearchDownArrow () {
+    var selected = notelist_el.find('option:selected');
+    if (0 == selected.length) {
+        // With nothing selected, the first item gets selected.
+        notelist_el.find('option:first').attr('selected', true);
+    } else {
+        // Cycle down, with wraparound.
+        var el = notelist_el
+            .find('option:selected').attr('selected', null)
+            .next('option');
+        if (el.length) {
+            el.attr('selected', true);
+        } else {
+            notelist_el.find('option:first').attr('selected', true);
+        }
+    }
+    return loadSelectedNote();
 }
 
 function loadNoteList (cb) {
