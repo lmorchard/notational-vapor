@@ -8,9 +8,12 @@
 
         <h1 class="title">notational drop</h1>
 
-        <button id="install">Install this web app</button>
+        <ul>
+            <li><a href="public/index.html">Launch the app</a>
+            <li><button id="install">Install this as an app</button>
+                (<span id="install-status">Not installed yet.</span>)</li>
+        </ul>
 
-        <p id="status">Not installed, yet.</p>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
         <script src="//apps.persona.org/include.js"></script>
@@ -28,9 +31,7 @@
                 var request = navigator.mozApps.getSelf();
                 request.onsuccess = function() {
                     if (request.result) {
-                        $('#status').text("Installed!");
-                    } else {
-                        // not installed
+                        $('#install-status').text("Installed");
                     }
                 }
                 request.onerror = function() {
