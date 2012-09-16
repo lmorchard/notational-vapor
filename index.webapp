@@ -1,0 +1,15 @@
+{
+  "version": "0.1",
+  "name": "notational-drop",
+  "description": "A plain text notebook in Dropbox",
+  "icons": {
+  },
+  "developer": {
+    "name": "Les Orchard",
+    "url": "http://lmorchard.com"
+  },
+  "installs_allowed_from": ["*"],
+  "orientation": "portrait,landscape-secondary",
+  "fullscreen": "true",
+  "default_locale": "en"
+}
