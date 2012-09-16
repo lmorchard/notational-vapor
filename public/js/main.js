@@ -26,7 +26,7 @@ var curr_note_saved = false;
 var client;
 
 function main () {
-    $('body').addClass('loading');
+    ui_el.addClass('loading');
     wireupUI();
 
     client = new Dropbox.Client(conf.DROPBOX_CONF);
@@ -38,7 +38,7 @@ function main () {
         if (err) { return; }
         loadNoteList(function () {
             refreshNoteList();
-            $('body').removeClass('loading');
+            ui_el.removeClass('loading');
         });
     });
 }
@@ -222,16 +222,13 @@ function loadSelectedNote () {
 function loadNote (fn) {
     if (!fn) { return; }
     if (fn == curr_note_fn) { return; }
-    $('body').addClass('loading');
+    ui_el.addClass('loading').removeClass('searching').addClass('editing');
     client.readFile(fn, function (err, data) {
         if (err) { return false; };
         note_el.val(data);
         curr_note_fn = fn;
         curr_note_saved = data;
-        $('body').removeClass('loading');
-
-        // Switch from searching to editing mode.
-        ui_el.removeClass('searching').addClass('editing');
+        ui_el.removeClass('loading');
     });
 }
 
