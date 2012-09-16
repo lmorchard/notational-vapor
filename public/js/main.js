@@ -12,9 +12,10 @@ var conf = {
 };
 
 var ui_id = '#main-ui';
-var search_el = $(ui_id + ' .search');
-var notelist_el = $(ui_id + ' .notes');
-var note_el = $(ui_id + ' .note');
+var ui_el = $(ui_id);
+var search_el = $(ui_id + ' .search input');
+var notelist_el = $(ui_id + ' .notes select');
+var note_el = $(ui_id + ' .note textarea');
 var notes = [];
 var search_load = null;
 var is_idle = true;
@@ -47,7 +48,7 @@ function wireupUI () {
     search_el[0].focus();
 
     // This form shouldn't do anything on submission
-    $(ui_id).submit(function (ev) { return false; });
+    ui_el.submit(function (ev) { return false; });
 
     // Load new note on list selection change.
     notelist_el.change(loadSelectedNote);
@@ -73,6 +74,9 @@ function wireupUI () {
 
     // Capture some keypresses in the search field.
     search_el.keypress(function (ev) {
+        // Switch from editing to search mode.
+        ui_el.removeClass('editing').addClass('searching');
+
         if (13 == ev.keyCode) {
             return handleSearchReturn();
         } else if (38 == ev.keyCode) {
@@ -219,6 +223,10 @@ function loadNote (fn) {
         curr_note_fn = fn;
         curr_note_saved = data;
         $('body').removeClass('loading');
+
+        // Switch from searching to editing mode.
+        ui_el.removeClass('searching').addClass('editing');
+        note_el[0].focus();
     });
 }
 

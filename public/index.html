@@ -2,14 +2,19 @@
     <head>
         <title>notational drop</title>
         <link rel="stylesheet" type="text/css" media="screen" href="css/main.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     </head>
     <body class="loading">
-        <h1>notational drop</h1>
 
         <form id="main-ui">
-            <input name="search" class="search" autocomplete="off">
-            <select class="notes" name="notes" size="8"></select>
-            <textarea class="note" rows="20"></textarea>
+            <div class="header">
+                <h1 class="title">notational drop</h1>
+            </div>
+            <ul>
+                <li class="search"><input name="search" autocomplete="off"></li>
+                <li class="notes"><select name="notes" size="8"></select></li>
+                <li class="note"><textarea rows="20"></textarea></li>
+            </ul>
         </form>
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
