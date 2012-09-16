@@ -74,6 +74,10 @@ function wireupUI () {
         }, conf.IDLE_TIMEOUT);
     });
 
+    search_el.focus(function (ev) {
+        ui_el.removeClass('editing').addClass('searching');
+    });
+
     // Capture some keypresses in the search field.
     search_el.keypress(function (ev) {
         // Switch from editing to search mode.
