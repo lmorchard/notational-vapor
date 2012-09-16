@@ -54,9 +54,11 @@ function wireupUI () {
     notelist_el.change(loadSelectedNote);
     
     // Check for new notes every 10 sec
+    /*
     setInterval(function () {
         loadNoteList(refreshNoteList);
     }, conf.REFRESH_TIMEOUT);
+    */
 
     // Check for need to save every 1 sec
     setInterval(function () {
@@ -108,7 +110,7 @@ function handleSearchReturn () {
         note_el.val('');
         curr_note_fn = search_el.val() + '.txt';
         curr_note_saved = '';
-        note_el.focus();
+        note_el[0].focus();
     }
 }
 
@@ -226,7 +228,6 @@ function loadNote (fn) {
 
         // Switch from searching to editing mode.
         ui_el.removeClass('searching').addClass('editing');
-        note_el[0].focus();
     });
 }
 
@@ -239,6 +240,7 @@ function maybeSaveNote () {
             if (err) { return; }
             saving = false;
             curr_note_saved = curr_note_txt;
+            loadNoteList(refreshNoteList);
         });
     }
 }

@@ -16,6 +16,7 @@ code is here, at least!
 
 ## TODO
 
+* better loading indicator
 * clean up and refactor this nasty nasty code
 * delete notes
 * button to force-refresh note list

@@ -101,4 +101,7 @@ body.loading #main-ui {
         display: block;
         left: 0; top: 4em; right: 0; bottom: 0;
     }
+    #main-ui.editing .search {
+        display: none;
+    }
 }
