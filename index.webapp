@@ -1,6 +1,7 @@
 {
   "version": "0.1",
   "name": "notational-drop",
+  "launch_path": "/notational-drop/public/index.html",
   "description": "A plain text notebook in Dropbox",
   "icons": {
   },
