@@ -2,3 +2,4 @@
 *.swo
 xfers
 tmp
+.DS_Store

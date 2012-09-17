@@ -14,9 +14,15 @@ App](https://developer.mozilla.org/en-US/apps) and work in
 Or, I may get bored and wander off before it's done. But, the (really crappy)
 code is here, at least!
 
+## Credits
+
+* Logo composed from [The Noun Project](http://thenounproject.com/) icons
+
 ## TODO
 
-* better loading indicator
+* example docs when app folder empty (eg. blank slate experience)
+* icon indicating whether the search field is searching or will create a new
+    document on enter
 * clean up and refactor this nasty nasty code
 * delete notes
 * button to force-refresh note list
