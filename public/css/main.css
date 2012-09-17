@@ -12,14 +12,15 @@ body {
     margin: 0; padding: 0;
 }
 #main-ui .header {
-    margin: 0; padding: 0;
+    margin: 0; padding: 0 0 0 40px;
     position: absolute; 
-    left: 0; top: 0; right: 0; height: 3em;
-    background: #ddd;
+    left: 0; top: 0; right: 0; height: 40px;
+    background: #ddd url(../img/icon-32.png) no-repeat 4px 4px;
 }
 #main-ui .header h1 {
-    margin: 0; padding: 0.3em;
+    margin: 0; padding: 0;
     font-size: 1.75em;
+    line-height: 40px;
 }
 #main-ui ul {
     margin: 0; padding: 0;
@@ -67,10 +68,13 @@ body {
 
 @media screen and (max-width: 850px) {
     #main-ui .header {
-        height: 2em;
+        height: 24px;
+        padding-left: 24px;
+        background: #ddd url(../img/icon-16.png) no-repeat 4px 4px;
     }
     #main-ui .header h1 {
-        font-size: 1.25em;
+        font-size: 1em;
+        line-height: 24px;
     }
     #main-ui .search {
         top: 2em; height: 2em;
