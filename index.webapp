@@ -6,6 +6,8 @@
   "icons": {
       "16": "/notational-vapor/public/img/icon-16.png",
       "32": "/notational-vapor/public/img/icon-32.png",
+      "48": "/notational-vapor/public/img/icon-48.png",
+      "64": "/notational-vapor/public/img/icon-64.png",
       "128": "/notational-vapor/public/img/icon-128.png",
       "256": "/notational-vapor/public/img/icon-256.png"
   },
@@ -14,7 +16,5 @@
     "url": "http://lmorchard.com"
   },
   "installs_allowed_from": ["*"],
-  "orientation": "portrait,landscape-secondary",
-  "fullscreen": "true",
   "default_locale": "en"
 }

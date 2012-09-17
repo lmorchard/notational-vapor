@@ -54,11 +54,9 @@ function wireupUI () {
     notelist_el.change(loadSelectedNote);
     
     // Check for new notes every 10 sec
-    /*
     setInterval(function () {
         loadNoteList(refreshNoteList);
     }, conf.REFRESH_TIMEOUT);
-    */
 
     // Check for need to save every 1 sec
     setInterval(function () {
@@ -74,6 +72,7 @@ function wireupUI () {
         }, conf.IDLE_TIMEOUT);
     });
 
+    // Focusing the search field switches to searching mode
     search_el.focus(function (ev) {
         ui_el.removeClass('editing').addClass('searching');
     });

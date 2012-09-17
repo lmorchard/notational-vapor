@@ -1,28 +1,40 @@
 <html>
     <head>
-        <title>notational vapor</title>
+        <title>Notational Vapor</title>
+        <link rel="stylesheet" type="text/css" media="screen" href="public/css/main.css">
         <link rel="shortcut icon" type="image/png" href="public/img/icon-16.png">
         <link rel="apple-touch-icon" href="img/icon-256.png" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     </head>
-    <body class="loading">
+    <body>
 
-        <h1 class="title">notational vapor</h1>
+        <article class="intro">
 
-        <ul>
-            <li><a href="public/index.html" target="_blank">Start the app</a>
-                (Requires a modern browser.)</li>
-            <li><button id="install">Install this app</button>
-                (<span id="install-status">Not installed yet.</span>
-                <a href="http://nightly.mozilla.org/">Firefox Nightly</a> required, for now.)</li>
-        </ul>
+            <img src="public/img/icon-256.png" class="logo">
+
+            <h1 class="title">Notational Vapor</h1>
+
+            <p>This is a notebook in the cloud, an <a href="https://developer.mozilla.org/en-US/apps">open web app</a> heavily inspired by <a href="http://notational.net">Notational Velocity</a>.</p>
+            <p>In fact, using <a href="">dropbox-js</a>, this will save notes to a folder in your Dropbox that can also be used directly from the original.</p>
+
+            <h2>Get started</h2>
+            <ul>
+                <li><a href="public/index.html" target="_blank">Start the app</a>
+                    (Requires a modern browser.)</li>
+                <li><button id="install">Install this app</button>
+                    (<span id="install-status">Not installed.</span>
+                    Installation requires <a href="http://nightly.mozilla.org/">Firefox Nightly</a>, for now.)</li>
+            </ul>
+
+        </article>
 
         <a href="https://github.com/lmorchard/notational-vapor/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="public/img/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>        
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-        <script src="//apps.persona.org/include.js"></script>
         <script type="text/javascript">
-            if (navigator.mozApps) {
+            if (!navigator.mozApps) {
+                $('#install').hide();
+            } else {
                 $('#install').click(function (ev) {
                     var request = navigator.mozApps.install("http://lmorchard.github.com/notational-vapor/index.webapp");
                     request.onsuccess = function() {
