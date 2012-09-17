@@ -22,8 +22,8 @@
                 <li><a href="public/index.html" target="_blank">Start the app</a>
                     (Requires a modern browser.)</li>
                 <li><button id="install">Install this app</button>
-                    (<span id="install-status">Not installed.</span>
-                    Installation requires <a href="http://nightly.mozilla.org/">Firefox Nightly</a>, for now.)</li>
+                    <span id="install-status">Not installed.</span>
+                    (Installation requires <a href="http://nightly.mozilla.org/">Firefox Nightly</a>, for now.)</li>
             </ul>
 
         </article>
@@ -47,7 +47,8 @@
                 var request = navigator.mozApps.getSelf();
                 request.onsuccess = function() {
                     if (request.result) {
-                        $('#install-status').text("Installed");
+                        $('#install-status').text("Installed.");
+                        $('#install').hide();
                     }
                 }
                 request.onerror = function() {
