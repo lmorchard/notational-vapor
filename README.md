@@ -1,4 +1,4 @@
-# notational-drop
+# notational-vapor
 
 I like [Notational Velocity](http://notational.net/). I like
 [Dropbox](http://dropbox.com). Sometimes, I keep my notes from Notational
@@ -21,6 +21,7 @@ code is here, at least!
 ## TODO
 
 * better launch page, github fork banner and some explanations
+* app cache manifest!
 * example docs when app folder empty (eg. blank slate experience)
 * dropbox auth status and log-out link in upper right
 * icon indicating whether the search field is searching or will create a new

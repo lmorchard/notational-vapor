@@ -1,13 +1,13 @@
 {
   "version": "0.1",
-  "name": "notational-drop",
-  "launch_path": "/notational-drop/public/index.html",
+  "name": "notational-vapor",
+  "launch_path": "/notational-vapor/public/index.html",
   "description": "A plain text notebook in Dropbox",
   "icons": {
-      "16": "/notational-drop/public/img/icon-16.png",
-      "32": "/notational-drop/public/img/icon-32.png",
-      "128": "/notational-drop/public/img/icon-128.png",
-      "256": "/notational-drop/public/img/icon-256.png"
+      "16": "/notational-vapor/public/img/icon-16.png",
+      "32": "/notational-vapor/public/img/icon-32.png",
+      "128": "/notational-vapor/public/img/icon-128.png",
+      "256": "/notational-vapor/public/img/icon-256.png"
   },
   "developer": {
     "name": "Les Orchard",
