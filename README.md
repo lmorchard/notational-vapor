@@ -20,7 +20,9 @@ code is here, at least!
 
 ## TODO
 
+* better launch page, github fork banner and some explanations
 * example docs when app folder empty (eg. blank slate experience)
+* dropbox auth status and log-out link in upper right
 * icon indicating whether the search field is searching or will create a new
     document on enter
 * clean up and refactor this nasty nasty code
