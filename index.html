@@ -48,7 +48,6 @@
                 request.onsuccess = function() {
                     if (request.result) {
                         $('#install-status').text("Installed.");
-                        $('#install').hide();
                     }
                 }
                 request.onerror = function() {
