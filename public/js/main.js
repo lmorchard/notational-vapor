@@ -6,7 +6,7 @@ var conf = {
     REFRESH_TIMEOUT: 5000,
     LOAD_SELECTION_TIMEOUT: 250,
     DROPBOX_CONF: {
-        key: "Nhymp6OEc5A=|LUJM/jOJzMmvtYbPsso7iXUrZJnnlTYbBUHAMeImhA==",
+        key: "/nmTfjZ3FnA=|r8bRfJP/iOYWc43sc0s1dccq65ih7rNzI9UnbEdDXw==",
         sandbox: true
     }
 };
