@@ -1,3 +1,4 @@
+html, body { overflow: hidden; height: 100% }
 body {
     margin: 0;
     padding: 0;
@@ -14,7 +15,7 @@ article.intro img.logo {
 }
 #main-ui {
     position: absolute;
-    top: 0; left: 0; bottom: 2px; right: 2px;
+    top: 0; left: 0; bottom: 0px; right: 0;
     margin: 0; padding: 0;
 }
 #main-ui .header {

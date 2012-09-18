@@ -21,18 +21,16 @@ code is here, at least!
 ## TODO
 
 * restrict characters accepted for titles, some are inappropriate for filenames (eg. "/")
-* better launch page, github fork banner and some explanations
+* 
 * app cache manifest!
 * example docs when app folder empty (eg. blank slate experience)
 * dropbox auth status and log-out link in upper right
-* icon indicating whether the search field is searching or will create a new
-    document on enter
-* clean up and refactor this nasty nasty code
 * delete notes
-* button to force-refresh note list
 * save button
+* button to force-refresh note list
 * handle errors
 * search note bodies... somehow?
+* clean up and refactor this nasty nasty code
 * markdown preview?
 * other storage APIs
     * s3, evernote, webdav
