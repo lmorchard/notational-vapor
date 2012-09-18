@@ -36,7 +36,7 @@
                 $('#install').hide();
             } else {
                 $('#install').click(function (ev) {
-                    var request = navigator.mozApps.install("http://lmorchard.github.com/notational-vapor/index.webapp");
+                    var request = navigator.mozApps.install("http://notational-vapor.lmorchard.com/index.webapp");
                     request.onsuccess = function() {
                         alert("INSTALLED OK!");
                     }
