@@ -123,7 +123,10 @@ function handleSearchTyping () {
     if (opts.length == 1) {
         opts.attr('selected', true);
         return loadSelectedNote();
+    } else if (opts.length == 0) {
+        search_el.parent().removeClass('searching').addClass('creating');
     } else {
+        search_el.parent().removeClass('creating').addClass('searching');
         var search_txt = (''+search_el.val()).toLowerCase();
         notelist_el.find('option').each(function () {
             var el = $(this);
