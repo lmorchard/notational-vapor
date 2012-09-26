@@ -21,7 +21,8 @@ code is here, at least!
 ## TODO
 
 * restrict characters accepted for titles, some are inappropriate for filenames (eg. "/")
-* 
+* table / data grid for document list - sortable columns, last modified
+* Draggable divider between doc list and editor?
 * app cache manifest!
 * example docs when app folder empty (eg. blank slate experience)
 * dropbox auth status and log-out link in upper right
