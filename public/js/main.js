@@ -238,6 +238,7 @@ function refreshNoteList () {
 
 function deselectNote () {
     curr_note_fn = null;
+    note_el.val('');
 }
 
 function removeSelectedNote () {
