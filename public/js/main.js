@@ -11,11 +11,19 @@ var conf = {
     }
 };
 
+var KEYS = {
+    DELETE: 8,
+    RETURN: 13,
+    UP: 38,
+    DOWN: 40,
+};
+
 var ui_id = '#main-ui';
 var ui_el = $(ui_id);
 var search_el = $(ui_id + ' .search input');
 var notelist_el = $(ui_id + ' .notes select');
 var note_el = $(ui_id + ' .note textarea');
+
 var notes = [];
 var search_load = null;
 var is_idle = true;
@@ -26,19 +34,21 @@ var curr_note_saved = false;
 var client;
 
 function main () {
-    ui_el.addClass('loading');
-    wireupUI();
+    connectToDropbox(wireupUI);
+}
 
+function connectToDropbox (cb) {
+    ui_el.addClass('loading');
     client = new Dropbox.Client(conf.DROPBOX_CONF);
     client.authDriver(new Dropbox.Drivers.Redirect({
         rememberUser: true
     }));
-
     client.authenticate(function(err, client) {
         if (err) { return; }
         loadNoteList(function () {
             refreshNoteList();
             ui_el.removeClass('loading');
+            cb();
         });
     });
 }
@@ -52,11 +62,20 @@ function wireupUI () {
 
     // Load new note on list selection change.
     notelist_el.change(loadSelectedNote);
+
+    notelist_el.keypress(function (ev) {
+        if (KEYS.DELETE == ev.keyCode) {
+            // Remove selected note on delete
+            return removeSelectedNote();
+        }
+    });
     
     // Check for new notes every 10 sec
+    /*
     setInterval(function () {
         loadNoteList(refreshNoteList);
     }, conf.REFRESH_TIMEOUT);
+    */
 
     // Check for need to save every 1 sec
     setInterval(function () {
@@ -72,6 +91,10 @@ function wireupUI () {
         }, conf.IDLE_TIMEOUT);
     });
 
+    // Handle tabs and indents more helpfully
+    $.fn.tabOverride.tabSize(4).autoIndent(true);
+    note_el.tabOverride(true);
+
     // Focusing the search field switches to searching mode
     search_el.focus(function (ev) {
         ui_el.removeClass('editing').addClass('searching');
@@ -82,11 +105,11 @@ function wireupUI () {
         // Switch from editing to search mode.
         ui_el.removeClass('editing').addClass('searching');
 
-        if (13 == ev.keyCode) {
+        if (KEYS.RETURN == ev.keyCode) {
             return handleSearchReturn();
-        } else if (38 == ev.keyCode) {
+        } else if (KEYS.UP == ev.keyCode) {
             return handleSearchUpArrow();
-        } else if (40 == ev.keyCode) {
+        } else if (KEYS.DOWN == ev.keyCode) {
             return handleSearchDownArrow();
         } else {
             // Defer reaction to other search text entry, so filtering gets
@@ -213,10 +236,24 @@ function refreshNoteList () {
     }
 }
 
+function deselectNote () {
+    curr_note_fn = null;
+}
+
+function removeSelectedNote () {
+    var path = notelist_el.val();
+    deselectNote();
+    client.remove(path, function (err, stat) {
+        loadNoteList(refreshNoteList);
+    });
+    return false;
+}
+
 function loadSelectedNote () {
     if (search_load) { clearTimeout(search_load); }
     search_load = setTimeout(function () {
-        loadNote(notelist_el.val());
+        var path = notelist_el.val();
+        loadNote(path);
     }, conf.LOAD_SELECTION_TIMEOUT);
     return false;
 }
