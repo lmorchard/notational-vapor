@@ -17,6 +17,12 @@ code is here, at least!
 ## Credits
 
 * Logo composed from [The Noun Project](http://thenounproject.com/) icons
+    * [Notebook](http://thenounproject.com/noun/notebook/#icon-No4512) - Monika Ciapala, from The Noun Project
+    * [Cloud upload](http://thenounproject.com/noun/cloud-upload/#icon-No2787) - P.J. Onori, from The Noun Project
+* Additional icons from The Noun Project:
+    * [Magnifying Glass](http://thenounproject.com/noun/magnifying-glass/#icon-No3017) - Ana Carolina Santos, from The Noun Project
+    * [Pencil](http://thenounproject.com/noun/pencil/#icon-No1170)
+    * [Gear](http://thenounproject.com/noun/gear/#icon-No1329)
 
 ## TODO
 
