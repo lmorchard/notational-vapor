@@ -167,6 +167,11 @@ article.intro img.logo {
         display: none;
     }
 }
+#main-ui.loading .note textarea {
+    display: none;
+}
+
+/* Courtesy of http://cssload.net/ */
 
 #main-ui #floatingBarsG {
     position:absolute;
@@ -175,14 +180,9 @@ article.intro img.logo {
     display: none;
 }
 
-#main-ui.loading .note #floatingBarsG {
+#main-ui.loading #floatingBarsG {
     display: block;
 }
-#main-ui.loading .note textarea {
-    display: none;
-}
-
-/* Courtesy of http://cssload.net/ */
 
 #floatingBarsG{
 width:62px;
