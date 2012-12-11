@@ -31,29 +31,6 @@
         <a href="https://github.com/lmorchard/notational-vapor/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="app/img/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>        
 
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>
-        <script type="text/javascript">
-            if (!navigator.mozApps) {
-                $('#install').hide();
-            } else {
-                $('#install').click(function (ev) {
-                    var request = navigator.mozApps.install("http://dev.notational-vapor.lmorchard.com/index.webapp");
-                    request.onsuccess = function() {
-                        alert("INSTALLED OK!");
-                    }
-                    request.onerror = function() {
-                        alert("FAILED INSTALLATION!");
-                    }
-                });
-                var request = navigator.mozApps.getSelf();
-                request.onsuccess = function() {
-                    if (request.result) {
-                        $('#install-status').text("Installed.");
-                    }
-                }
-                request.onerror = function() {
-                  alert('Error checking installation status: ' + this.error.message);
-                }
-            }
-        </script>
+        <script src="app/js/installer.js"></script>
     </body>
 </html>
