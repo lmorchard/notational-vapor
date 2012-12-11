@@ -42,5 +42,15 @@ code is here, at least!
     * Might depend on the storage driver
 * markdown preview?
 * other storage drivers
-    * s3, evernote, webdav, remotestorage
+    * Amazon S3 (cors?)
+    * Evernote API
+    * RemoteStorage
+    * LocalStorage
+    * WebDav
+    * Local FS?
 * clean up and refactor this nasty nasty code, in general
+    * find a cleaner way to inject that CSS-based spinner
+    * consider not nuking and rebuilding notes list with every change in data
+        model or search filtering.
+* consider using docco to turn the code into a blog post
+* start using [grunt](http://gruntjs.com/) for deployment and etc?
