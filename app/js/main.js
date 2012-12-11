@@ -21,7 +21,7 @@ var KEYS = {
 var ui_id = '#main-ui';
 var ui_el = $(ui_id);
 var search_el = $(ui_id + ' .search input');
-var notelist_el = $(ui_id + ' .notes select');
+var notelist_el = $(ui_id + ' .notes table');
 var note_el = $(ui_id + ' .note textarea');
 
 var notes = [];
@@ -61,7 +61,15 @@ function wireupUI () {
     ui_el.submit(function (ev) { return false; });
 
     // Load new note on list selection change.
-    notelist_el.change(loadSelectedNote);
+    notelist_el.click(function (ev) {
+        var row = $(ev.target).parent('tr');
+        if (row.length) {
+            notelist_el.find('tr').removeClass('selected');
+            row.addClass('selected');
+            selectNote(row.attr('data-value'));
+            loadSelectedNote();
+        }
+    });
 
     notelist_el.keypress(function (ev) {
         if (KEYS.DELETE == ev.keyCode) {
@@ -221,10 +229,12 @@ function refreshNoteList () {
     $.each(notes, function (idx, item) {
         var label_txt = item.label.toLowerCase();
         if (search && (-1 == label_txt.indexOf(search))) { return; }
-        var c = document.createElement('option');
-        c.innerHTML = item.label;
-        c.value = item.id;
-        notelist_el.append(c);
+        var row = document.createElement('tr');
+        var c1 = document.createElement('td');
+        $(c1).text(item.label);
+        $(row).attr('data-value', item.id)
+              .append(c1);
+        notelist_el.append(row);
     });
     if (curr_note_fn) {
         notelist_el.find('option').each(function () {
@@ -241,6 +251,10 @@ function deselectNote () {
     note_el.val('');
 }
 
+function selectNote (fn) {
+    curr_note_fn = fn;
+}
+
 function removeSelectedNote () {
     var path = notelist_el.val();
     deselectNote();
@@ -251,17 +265,19 @@ function removeSelectedNote () {
 }
 
 function loadSelectedNote () {
+    loadNote(curr_note_fn);
+    /*
     if (search_load) { clearTimeout(search_load); }
     search_load = setTimeout(function () {
-        var path = notelist_el.val();
-        loadNote(path);
+        loadNote(curr_note_fn);
     }, conf.LOAD_SELECTION_TIMEOUT);
+    */
     return false;
 }
 
 function loadNote (fn) {
-    if (!fn) { return; }
-    if (fn == curr_note_fn) { return; }
+    //if (!fn) { return; }
+    //if (fn == curr_note_fn) { return; }
     ui_el.addClass('loading').removeClass('searching').addClass('editing');
     client.readFile(fn, function (err, data) {
         if (err) { return false; };

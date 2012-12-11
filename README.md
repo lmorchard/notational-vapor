@@ -23,9 +23,11 @@ code is here, at least!
     * [Magnifying Glass](http://thenounproject.com/noun/magnifying-glass/#icon-No3017) - Ana Carolina Santos, from The Noun Project
     * [Pencil](http://thenounproject.com/noun/pencil/#icon-No1170)
     * [Gear](http://thenounproject.com/noun/gear/#icon-No1329)
+    * <a href="http://thenounproject.com/noun/document/#icon-No5034" target="_blank">Document</a> designed by <a href="http://thenounproject.com/DmitryBaranovskiy" target="_blank">Dmitry Baranovskiy</a> from The Noun Project
 
 ## TODO
 
+* Trap back button (for android, etal) with History API
 * restrict characters accepted for titles, some are inappropriate for filenames (eg. "/")
 * table / data grid for document list - sortable columns, last modified
 * Draggable divider between doc list and editor?
