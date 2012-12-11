@@ -39,7 +39,8 @@ code is here, at least!
 * button to force-refresh note list
 * handle errors
 * search note bodies... somehow?
-* clean up and refactor this nasty nasty code
+    * Might depend on the storage driver
 * markdown preview?
-* other storage APIs
-    * s3, evernote, webdav
+* other storage drivers
+    * s3, evernote, webdav, remotestorage
+* clean up and refactor this nasty nasty code, in general
