@@ -27,7 +27,6 @@ code is here, at least!
 
 ## TODO
 
-* Trap back button (for android, etal) with History API
 * restrict characters accepted for titles, some are inappropriate for filenames (eg. "/")
 * table / data grid for document list - sortable columns, last modified
 * Draggable divider between doc list and editor?

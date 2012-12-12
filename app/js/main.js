@@ -5,6 +5,7 @@ var conf = {
     IDLE_TIMEOUT: 1000,
     REFRESH_TIMEOUT: 10000,
     ARROW_SELECTION_DELAY: 350,
+    SEARCH_UPDATE_INTERVAL: 1000,
     DROPBOX_CONF: {
         key: "/nmTfjZ3FnA=|r8bRfJP/iOYWc43sc0s1dccq65ih7rNzI9UnbEdDXw==",
         sandbox: true
@@ -14,6 +15,7 @@ var conf = {
 var notes = [];
 var idle_timer = null;
 var load_timer = null;
+var search_timer = null;
 var loading = false;
 var saving = false;
 var should_refresh_notes = false;
@@ -32,6 +34,20 @@ var KEY_RETURN = 13;
 var KEY_UP = 38;
 var KEY_DOWN = 40;
 
+// Routes to dispatch on hash change
+// TODO: Use a better router
+var HASH_ROUTES = [
+    ['^#search/(.*)', function (m) {
+        gotoSearchMode(decodeURIComponent(m[1]));
+    }],
+    ['^#search', function (m) {
+        gotoSearchMode();
+    }],
+    ['^#notes/(.*)', function (m) {
+        selectNote(decodeURIComponent(m[1]));
+    }]
+];
+
 /**
  * Main driver
  */
@@ -40,6 +56,7 @@ function main () {
 
     // Exports
     return {
+        gotoSearchMode: gotoSearchMode,
         selectNote: selectNote,
         getSelectedNote: getSelectedNote
     };
@@ -78,15 +95,68 @@ function wireupUI () {
     });
 
     // Focusing the search field switches to searching mode
-    search_el.focus(function (ev) {
-        ui_el.removeClass('editing').addClass('searching');
+    search_el.click(function (ev) {
+        gotoSearchMode();
     });
 
     // Capture some keypresses in the search field.
     search_el.keypress(handleNavKeypress);
 
-    // Start with search focused.
+    // HACK: Editing in the search field on mobile devices seems not to result
+    // in keypresses, so this periodically polls the field while in editing
+    // mode.
+    search_timer = setInterval(function () {
+        if (!ui_el.hasClass('searching')) { return; }
+        handleSearchChange();
+    }, conf.SEARCH_UPDATE_INTERVAL);
+
+    // Use location.hash as a within-app URL for view routing.
+    dispatchLocationHash();
+    window.addEventListener('popstate', dispatchLocationHash);
+
+    // Start in search mode, by default.
+    if (!location.hash) {
+        gotoSearchMode();
+    }
+}
+
+/**
+ * Dispatch an appropriate action based on the location hash.
+ * TODO: Use a better router here, this is a bit crap
+ */
+function dispatchLocationHash (ev) {
+    var hash = location.hash;
+    for (var i=0; i < HASH_ROUTES.length; i++) {
+        var route = HASH_ROUTES[i];
+        var re = new RegExp(route[0]);
+        var m = re.exec(hash);
+        if (m) { route[1](m); break; }
+    }
+}
+
+/**
+ * Push an update to the location hash, if necessary.
+ */
+function pushHashChange (hash) {
+    if (!hash || location.hash == hash) { return; }
+    window.history.pushState(null, null, hash);
+}
+
+/**
+ * Switch to search mode.
+ */
+function gotoSearchMode (term) {
+    // If already in search mode, bail.
+    if (ui_el.hasClass('searching')) { return; }
     search_el[0].focus();
+    ui_el.removeClass('editing').addClass('searching');
+    if (!term) {
+        pushHashChange('#search');
+    } else {
+        search_el.val(term);
+        refreshNoteList();
+        pushHashChange('#search/' + encodeURIComponent(term));
+    }
 }
 
 /**
@@ -127,8 +197,8 @@ function handleIdle () {
  * Handle navigation keypresses in the search field.
  */
 function handleNavKeypress (ev) {
-    // Switch from editing to search mode.
-    ui_el.removeClass('editing').addClass('searching');
+    // Enter search mode, if we're not there already...
+    if (!ui_el.hasClass('searching')) { gotoSearchMode(); }
 
     if (KEY_RETURN == ev.keyCode) {
         return handleSearchReturn();
@@ -139,14 +209,14 @@ function handleNavKeypress (ev) {
     } else {
         // Defer reaction to other search text entry, so filtering gets
         // access to the updated text field.
-        setTimeout(handleSearchTyping, 0.1);
+        setTimeout(handleSearchChange, 0.1);
     }
 }
 
 /**
  * Select the given filename in the list, and schedule it for loading.
  */
-function selectNote (fn, skip_loading, load_delay) {
+function selectNote (fn, skip_loading, load_delay, skip_scrolling) {
     // Search for row matching the given filename.
     var row = null;
     notelist_el.find('tr').each(function () {
@@ -162,21 +232,27 @@ function selectNote (fn, skip_loading, load_delay) {
     notelist_el.find('tr.selected').removeClass('selected');
     row.addClass('selected');
 
-    // Ensure the notelist is scrolled such that the selected row is visible.
-    var scroll_top = notelist_el[0].scrollTop;
-    var scroll_height = notelist_el[0].offsetHeight;
-    var row_top = row[0].offsetTop;
-    var row_bottom = row_top + row[0].offsetHeight;
-    if (row_top < scroll_top) {
-        // Scroll up to reveal item at top
-        notelist_el[0].scrollTop = row_top;
-    } else if (row_bottom > scroll_top + scroll_height) {
-        // Scroll down just enough to reveal item at bottom
-        notelist_el[0].scrollTop = row_bottom - scroll_height;
+    if (!skip_scrolling) {
+        // Ensure the notelist is scrolled such that the selected row is visible.
+        var scroll_top = notelist_el[0].scrollTop;
+        var scroll_height = notelist_el[0].offsetHeight;
+        var row_top = row[0].offsetTop;
+        var row_bottom = row_top + row[0].offsetHeight;
+        if (row_top < scroll_top) {
+            // Scroll up to reveal item at top
+            notelist_el[0].scrollTop = row_top;
+        } else if (row_bottom > scroll_top + scroll_height) {
+            // Scroll down just enough to reveal item at bottom
+            notelist_el[0].scrollTop = row_bottom - scroll_height;
+        }
     }
 
     // Finally, load if necessary, with a delay if any.
     if (!skip_loading) {
+        
+        // Update the location to reflect the selected note.
+        pushHashChange('#notes/' + encodeURIComponent(fn));
+
         if (!load_delay) {
             return loadNote(fn);
         } else {
@@ -207,7 +283,7 @@ function getSelectedNote () {
 /**
  * Typing in the search box filters down the notes list.
  */
-function handleSearchTyping () {
+function handleSearchChange () {
     // Refreshing filters by the current contents of the search field.
     refreshNoteList();
 
@@ -223,6 +299,16 @@ function handleSearchTyping () {
     } else {
         // Multiple results, so we're in search mode.
         search_el.parent().removeClass('creating').addClass('searching');
+
+        // Also, update the current hash based on search terms.
+        var term = search_el.val();
+        var search_hash = '#search';
+        if (term) {
+            search_hash += '/' + encodeURIComponent(term);
+        }
+        if (search_hash != location.hash) {
+            window.history.replaceState(null, null, search_hash);
+        }
     }
 }
 
@@ -282,13 +368,15 @@ function handleSearchArrow (is_up) {
  * search field using case-insensitive match.
  */
 function refreshNoteList () {
-    var search = (''+search_el.val()).toLowerCase();
+    
     // TODO: Someday, do this more incrementally, rather than nuke and rebuild.
+    var term = search_el.val();
+    var term_lc = (''+term).toLowerCase();
     notelist_el.empty();
     $.each(notes, function (idx, item) {
         // TODO: Fuzzier search algo?
         var label_txt = item.label.toLowerCase();
-        if (search && (-1 == label_txt.indexOf(search))) { return; }
+        if (term_lc && (-1 == label_txt.indexOf(term_lc))) { return; }
         var row = document.createElement('tr');
         var c1 = document.createElement('td');
         $(c1).text(item.label);
@@ -297,8 +385,8 @@ function refreshNoteList () {
         notelist_el.append(row);
     });
     if (curr_note_fn) {
-        // Re-select currently loaded note, if any, but don't re-load.
-        selectNote(curr_note_fn, true);
+        // Re-select currently loaded note, skip reload and scroll.
+        selectNote(curr_note_fn, true, 0, true);
     }
 }
 
