@@ -11,19 +11,6 @@ var conf = {
     }
 };
 
-var KEYS = {
-    DELETE: 8,
-    RETURN: 13,
-    UP: 38,
-    DOWN: 40,
-};
-
-var ui_id = '#main-ui';
-var ui_el = $(ui_id);
-var search_el = $(ui_id + ' .search input');
-var notelist_el = $(ui_id + ' .notes table');
-var note_el = $(ui_id + ' .note textarea');
-
 var notes = [];
 var idle_timer = null;
 var load_timer = null;
@@ -33,6 +20,17 @@ var should_refresh_notes = false;
 var curr_note_fn = false;
 var curr_note_saved = false;
 var client;
+
+var ui_id = '#main-ui';
+var ui_el = $(ui_id);
+var search_el = $(ui_id + ' .search input');
+var notelist_el = $(ui_id + ' .notes table');
+var note_el = $(ui_id + ' .note textarea');
+
+var KEY_DELETE = 8;
+var KEY_RETURN = 13;
+var KEY_UP = 38;
+var KEY_DOWN = 40;
 
 /**
  * Main driver
@@ -51,13 +49,8 @@ function main () {
  * Wire up the UI elements
  */
 function wireupUI () {
-    // Start with search focused.
-    search_el[0].focus();
-
     // This form shouldn't do anything on submission
-    ui_el.submit(function (ev) {
-        return false;
-    });
+    ui_el.submit(function (ev) { return false; });
 
     // Handle tabs and indents more helpfully
     $.fn.tabOverride.tabSize(4).autoIndent(true);
@@ -68,85 +61,30 @@ function wireupUI () {
         should_refresh_notes = true;
     }, conf.REFRESH_TIMEOUT);
 
-    // Load new note on list selection change.
+    // Bump the idle timer on clicks or keypresses that bubble up to the
+    // document body, which should be most we care about.
+    $(document.body)
+        .click(startIdleTimer)
+        .keypress(startIdleTimer);
+
+    // Load new note on list click.
     notelist_el.click(function (ev) {
-        startIdleTimer();
         var row = $(ev.target).parent('tr');
         if (row.length) {
             selectNote(row.data('value'));
         }
-        return false;
-    });
-
-    // Watch note typing activity to wait for idle time
-    note_el.keypress(function (ev) {
-        startIdleTimer();
     });
 
     // Focusing the search field switches to searching mode
     search_el.focus(function (ev) {
-        startIdleTimer();
         ui_el.removeClass('editing').addClass('searching');
     });
 
     // Capture some keypresses in the search field.
-    search_el.keypress(function (ev) {
-        startIdleTimer();
+    search_el.keypress(handleNavKeypress);
 
-        // Switch from editing to search mode.
-        ui_el.removeClass('editing').addClass('searching');
-
-        if (KEYS.RETURN == ev.keyCode) {
-            return handleSearchReturn();
-        } else if (KEYS.UP == ev.keyCode) {
-            return handleSearchArrow(true);
-        } else if (KEYS.DOWN == ev.keyCode) {
-            return handleSearchArrow(false);
-        } else {
-            // Defer reaction to other search text entry, so filtering gets
-            // access to the updated text field.
-            setTimeout(handleSearchTyping, 0.1);
-        }
-    });
-}
-
-/**
- * Select the given filename in the list, and schedule it for loading.
- */
-function selectNote (fn, skip_loading, load_delay) {
-    notelist_el.find('tr.selected').removeClass('selected');
-    notelist_el.find('tr').each(function () {
-        var row = $(this);
-        if (fn == row.data('value')) {
-            row.addClass('selected');
-            if (!skip_loading) {
-                if (!load_delay) {
-                    return loadNote(fn);
-                } else {
-                    if (load_timer) { clearTimeout(load_timer); }
-                    load_timer = setTimeout(function () {
-                        loadNote(fn);
-                    }, load_delay);
-                }
-            }
-        }
-    });
-}
-
-/**
- * Deselect currently selected note, if any.
- */
-function deselectNote () {
-    curr_note_fn = null;
-    note_el.val('');
-    notelist_el.find('tr:selected').removeClass('selected');
-}
-
-/**
- * Find the currently-selected note filename in the list.
- */
-function getSelectedNote () {
-    return notelist_el.find('tr.selected').data('value');
+    // Start with search focused.
+    search_el[0].focus();
 }
 
 /**
@@ -163,11 +101,93 @@ function startIdleTimer () {
  * Perform some tasks when we're idle (eg. save, refresh note list, etc)
  */
 function handleIdle () {
+    // TODO: Should all of this be made more async / callback driven?
     maybeSaveNote();
     if (should_refresh_notes) {
         should_refresh_notes = false;
         loadNoteList(refreshNoteList);
     }
+}
+
+/**
+ * Handle navigation keypresses in the search field.
+ */
+function handleNavKeypress (ev) {
+    // Switch from editing to search mode.
+    ui_el.removeClass('editing').addClass('searching');
+
+    if (KEY_RETURN == ev.keyCode) {
+        return handleSearchReturn();
+    } else if (KEY_UP == ev.keyCode) {
+        return handleSearchArrow(true);
+    } else if (KEY_DOWN == ev.keyCode) {
+        return handleSearchArrow(false);
+    } else {
+        // Defer reaction to other search text entry, so filtering gets
+        // access to the updated text field.
+        setTimeout(handleSearchTyping, 0.1);
+    }
+}
+
+/**
+ * Select the given filename in the list, and schedule it for loading.
+ */
+function selectNote (fn, skip_loading, load_delay) {
+    // Search for row matching the given filename.
+    var row = null;
+    notelist_el.find('tr').each(function () {
+        // TODO: Could probably do this with a selector on the data-value
+        // attribute, but afraid some filenames will break the selector syntax
+        // without escaping (which I haven't learned to do yet)
+        var el = $(this);
+        if (fn == el.data('value')) { row = el; }
+    });
+    if (!row) { return; }
+
+    // Ensure only the matching row is selected.
+    notelist_el.find('tr.selected').removeClass('selected');
+    row.addClass('selected');
+
+    // Ensure the notelist is scrolled such that the selected row is visible.
+    var scroll_top = notelist_el[0].scrollTop;
+    var scroll_height = notelist_el[0].offsetHeight;
+    var row_top = row[0].offsetTop;
+    var row_bottom = row_top + row[0].offsetHeight;
+    if (row_top < scroll_top) {
+        // Scroll up to reveal item at top
+        notelist_el[0].scrollTop = row_top;
+    } else if (row_bottom > scroll_top + scroll_height) {
+        // Scroll down just enough to reveal item at bottom
+        notelist_el[0].scrollTop = row_bottom - scroll_height;
+    }
+
+    // Finally, load if necessary, with a delay if any.
+    if (!skip_loading) {
+        if (!load_delay) {
+            return loadNote(fn);
+        } else {
+            if (load_timer) { clearTimeout(load_timer); }
+            load_timer = setTimeout(function () {
+                loadNote(fn);
+            }, load_delay);
+        }
+    }
+}
+
+/**
+ * Deselect currently selected note, if any.
+ */
+function deselectNote () {
+    curr_note_fn = null;
+    note_el.val('');
+    notelist_el.find('tr.selected').removeClass('selected');
+}
+
+/**
+ * Find the currently-selected note filename in the list.
+ */
+function getSelectedNote () {
+    return notelist_el.find('tr.selected').data('value');
 }
 
 /**
