@@ -49,6 +49,8 @@ function main () {
  * Wire up the UI elements
  */
 function wireupUI () {
+    buildSpinner();
+
     // This form shouldn't do anything on submission
     ui_el.submit(function (ev) { return false; });
 
@@ -85,6 +87,18 @@ function wireupUI () {
 
     // Start with search focused.
     search_el[0].focus();
+}
+
+/**
+ * Programmatically build and inject the spinner into the UI DOM.
+ */
+function buildSpinner () {
+    var spinner_el = $('<div id="floatingBarsG"></div>');
+    for (var i=1; i<9; i++) {
+        var id = 'rotateG_0' + i;
+        spinner_el.append('<div class="blockG" id="' + id + '"></div>');
+    }
+    ui_el.append(spinner_el);
 }
 
 /**

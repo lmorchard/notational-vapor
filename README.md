@@ -49,7 +49,6 @@ code is here, at least!
     * WebDav
     * Local FS?
 * clean up and refactor this nasty nasty code, in general
-    * find a cleaner way to inject that CSS-based spinner
     * consider not nuking and rebuilding notes list with every change in data
         model or search filtering.
 * consider using docco to turn the code into a blog post
