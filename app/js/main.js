@@ -52,7 +52,9 @@ var HASH_ROUTES = [
  * Main driver
  */
 function main () {
-    connectToStorage(wireupUI);
+    $(document).ready(function () {
+        connectToStorage(wireupUI);
+    });
 
     // Exports
     return {
@@ -95,7 +97,7 @@ function wireupUI () {
     });
 
     // Focusing the search field switches to searching mode
-    search_el.click(function (ev) {
+    search_el.focus(function (ev) {
         gotoSearchMode();
     });
 
@@ -111,8 +113,8 @@ function wireupUI () {
     }, conf.SEARCH_UPDATE_INTERVAL);
 
     // Use location.hash as a within-app URL for view routing.
-    dispatchLocationHash();
-    window.addEventListener('popstate', dispatchLocationHash);
+    dispatchHash();
+    window.addEventListener('popstate', dispatchHash);
 
     // Start in search mode, by default.
     if (!location.hash) {
@@ -124,7 +126,7 @@ function wireupUI () {
  * Dispatch an appropriate action based on the location hash.
  * TODO: Use a better router here, this is a bit crap
  */
-function dispatchLocationHash (ev) {
+function dispatchHash (ev) {
     var hash = location.hash;
     for (var i=0; i < HASH_ROUTES.length; i++) {
         var route = HASH_ROUTES[i];
@@ -197,9 +199,6 @@ function handleIdle () {
  * Handle navigation keypresses in the search field.
  */
 function handleNavKeypress (ev) {
-    // Enter search mode, if we're not there already...
-    if (!ui_el.hasClass('searching')) { gotoSearchMode(); }
-
     if (KEY_RETURN == ev.keyCode) {
         return handleSearchReturn();
     } else if (KEY_UP == ev.keyCode) {
@@ -379,7 +378,7 @@ function refreshNoteList () {
         if (term_lc && (-1 == label_txt.indexOf(term_lc))) { return; }
         var row = document.createElement('tr');
         var c1 = document.createElement('td');
-        $(c1).text(item.label);
+        $(c1).addClass('label').text(item.label);
         $(row).attr('data-value', item.id)
               .append(c1);
         notelist_el.append(row);
@@ -414,15 +413,18 @@ function connectToStorage (cb) {
  */
 function loadNoteList (cb) {
     notes = [];
-    client.readdir('/', function (err, entries) {
-        entries.forEach(function (entry) {
-            if ('.' == entry.substr(0,1)) { return; }
-            if ('.txt' != entry.substr(-4)) { return; }
+    client.readdir('/', function (err, entries, folder_stat, file_stats) {
+        for (var i=0; i < file_stats.length; i++) {
+            var fs = file_stats[i];
+            if (!fs.isFile) { continue; }
+            if ('.' == fs.name.substr(0, 1)) { continue; }
+            if ('.txt' != fs.name.substr(-4)) { continue; }
             notes.push({
-                id: entry, 
-                label: entry.substr(0, entry.length - 4)
+                id: fs.name, 
+                label: fs.name.substr(0, fs.name.length - 4),
+                modified: fs.modifiedAt
             });
-        });
+        }
         cb(notes);
     });
 }

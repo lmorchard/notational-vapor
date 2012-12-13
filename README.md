@@ -32,14 +32,19 @@ code is here, at least!
 * Draggable divider between doc list and editor?
 * app cache manifest!
 * example docs when app folder empty (eg. blank slate experience)
-* dropbox auth status and log-out link in upper right
-* delete notes
-* save button
+* Note actions UI
+    * save, delete
 * button to force-refresh note list
 * handle errors
 * search note bodies... somehow?
     * Might depend on the storage driver
 * markdown preview?
+* HTML notes?
+    * Option to switch from txt to html
+    * Need an HTML editor - ie. markdown w/ preview, ckeditor, markitup, etc
+* Settings panel
+    * dropbox auth status and log-out
+    * theme, font settings, etc
 * other storage drivers
     * Amazon S3 (cors?)
     * Evernote API
@@ -52,3 +57,4 @@ code is here, at least!
         model or search filtering.
 * consider using docco to turn the code into a blog post
 * start using [grunt](http://gruntjs.com/) for deployment and etc?
+    * concat/minify JS
