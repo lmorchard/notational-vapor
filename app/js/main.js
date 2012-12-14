@@ -31,6 +31,7 @@ var note_el = $(ui_id + ' .note textarea');
 
 var KEY_DELETE = 8;
 var KEY_RETURN = 13;
+var KEY_ESC = 27;
 var KEY_UP = 38;
 var KEY_DOWN = 40;
 
@@ -199,16 +200,20 @@ function handleIdle () {
  * Handle navigation keypresses in the search field.
  */
 function handleNavKeypress (ev) {
-    if (KEY_RETURN == ev.keyCode) {
-        return handleSearchReturn();
-    } else if (KEY_UP == ev.keyCode) {
-        return handleSearchArrow(true);
-    } else if (KEY_DOWN == ev.keyCode) {
-        return handleSearchArrow(false);
-    } else {
-        // Defer reaction to other search text entry, so filtering gets
-        // access to the updated text field.
-        setTimeout(handleSearchChange, 0.1);
+    switch (ev.keyCode) {
+        case KEY_RETURN:
+            return handleSearchReturn();
+        case KEY_UP:
+            return handleSearchArrow(true);
+        case KEY_DOWN:
+            return handleSearchArrow(false);
+        case KEY_ESC:
+            search_el.val('');
+            return handleSearchChange();
+        default:
+            // Defer reaction to other search text entry, so filtering gets
+            // access to the updated text field.
+            setTimeout(handleSearchChange, 0.1);
     }
 }
 
@@ -419,12 +424,20 @@ function loadNoteList (cb) {
             if (!fs.isFile) { continue; }
             if ('.' == fs.name.substr(0, 1)) { continue; }
             if ('.txt' != fs.name.substr(-4)) { continue; }
-            notes.push({
+            var note = {
                 id: fs.name, 
                 label: fs.name.substr(0, fs.name.length - 4),
                 modified: fs.modifiedAt
-            });
+            };
+            notes.push(note);
         }
+        // Sort by most recently modified
+        // TODO: Make this an option
+        notes.sort(function (b, a) {
+            var am = a.modified;
+            var bm = b.modified;
+            return (am > bm) ? 1 : ((am < bm) ? -1 : 0);
+        });
         cb(notes);
     });
 }
