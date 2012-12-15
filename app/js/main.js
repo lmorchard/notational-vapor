@@ -4,6 +4,7 @@ window.app = (function () {
 var conf = {
     IDLE_TIMEOUT: 1000,
     REFRESH_TIMEOUT: 10000,
+    LONGPRESS_TIMEOUT: 500,
     ARROW_SELECTION_DELAY: 350,
     SEARCH_UPDATE_INTERVAL: 1000,
     DROPBOX_CONF: {
@@ -34,6 +35,10 @@ var KEY_RETURN = 13;
 var KEY_ESC = 27;
 var KEY_UP = 38;
 var KEY_DOWN = 40;
+
+var MOUSE_LEFT = 1;
+var MOUSE_MIDDLE = 2;
+var MOUSE_RIGHT = 3;
 
 // Routes to dispatch on hash change
 // TODO: Use a better router
@@ -89,14 +94,6 @@ function wireupUI () {
         .click(startIdleTimer)
         .keypress(startIdleTimer);
 
-    // Load new note on list click.
-    notelist_el.click(function (ev) {
-        var row = $(ev.target).parent('tr');
-        if (row.length) {
-            selectNote(row.data('value'));
-        }
-    });
-
     // Focusing the search field switches to searching mode
     search_el.focus(function (ev) {
         gotoSearchMode();
@@ -112,6 +109,32 @@ function wireupUI () {
         if (!ui_el.hasClass('searching')) { return; }
         handleSearchChange();
     }, conf.SEARCH_UPDATE_INTERVAL);
+
+    // Single quick click selects a note. But, a long click and a right click
+    // are handled as a "meta" click. Currently, that just means delete, but
+    // could summon a menu someday.
+    var longpress_timer = null;
+    notelist_el
+        .mousedown(function (ev) {
+            // A long click is a mousedown without a mouseup for a long time
+            if (MOUSE_LEFT != ev.which) { return; } 
+            longpress_timer = setTimeout(function () {
+                longpress_timer = null;
+                handleNoteListMetaClick(ev);
+            }, conf.LONGPRESS_TIMEOUT);
+        })
+        .mouseup(function (ev) {
+            // If mouseup before longpress timer fires, this is a click
+            if (MOUSE_LEFT != ev.which) { return; } 
+            if (!longpress_timer) { return; }
+            clearTimeout(longpress_timer);
+            longpress_timer = null;
+            return handleNoteListClick(ev);
+        })
+        .contextmenu(function (ev) {
+            handleNoteListMetaClick(ev);
+            return false;
+        });
 
     // Use location.hash as a within-app URL for view routing.
     dispatchHash();
@@ -156,6 +179,7 @@ function gotoSearchMode (term) {
     if (!term) {
         pushHashChange('#search');
     } else {
+        alert(term);
         search_el.val(term);
         refreshNoteList();
         pushHashChange('#search/' + encodeURIComponent(term));
@@ -194,6 +218,66 @@ function handleIdle () {
         should_refresh_notes = false;
         loadNoteList(refreshNoteList);
     }
+}
+
+/**
+ * Handle click on the notes list, selects note.
+ */
+function handleNoteListClick (ev) {
+    var row = $(ev.target).parent('tr');
+    if (!row.length) { return; }
+
+    if (row.hasClass('selected')) {
+        summonNoteItemRename(row);
+    } else {
+        selectNote(row.data('value'));
+    }
+}
+
+/**
+ * Initiate the renaming of a note item.
+ */
+function summonNoteItemRename (row) {
+    var fn = row.data('value');
+    var label = fn.substr(0, fn.length - 4);
+
+    // Nuke any existing rename fields, just in case.
+    ui_el.find('textarea.rename').remove();
+
+    // Build and wire up a new in-place rename field.
+    $('<textarea class="rename"></textarea>')
+        // Cover up the original note item's position & size
+        .offset(row.offset())
+        .css({width: row[0].offsetWidth, height: row[0].offsetHeight})
+        // Blur cancels the rename and removes the field.
+        .blur(function (ev) {
+            $(this).remove(); 
+        })
+        // Catch a couple of significant keypresses...
+        .keypress(function (ev) {
+            switch (ev.keyCode) {
+                case KEY_ESC: // Escape cancels
+                    $(this).remove();
+                    return false;
+                case KEY_RETURN: // Return commits
+                    var name = $(this).val();
+                    alert("NAME " + name);
+                    $(this).remove();
+                    return false;
+            }
+        })
+        .appendTo(ui_el)
+        .val(label).focus().select();
+}
+
+/**
+ * Handle "meta" click, invokes additional actions on note.
+ */
+function handleNoteListMetaClick (ev) {
+    var row = $(ev.target).parent('tr');
+    if (!row.length) { return; }
+
+    console.log("DELETE", row.data('value'));
 }
 
 /**

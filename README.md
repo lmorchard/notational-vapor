@@ -27,6 +27,7 @@ code is here, at least!
 
 ## TODO
 
+* Blog about all of this
 * Note actions UI
     * What's the best UI and where to put it?
         * And what's it look like in the various window sizes?
@@ -38,7 +39,8 @@ code is here, at least!
 * Settings panel
     * dropbox auth status and log-out
     * theme, font settings, etc
-* restrict characters accepted for titles, some are inappropriate for filenames (eg. "/")
+* Only update notes list, save note when tab is visible
+    * https://developer.mozilla.org/en-US/docs/DOM/Using_the_Page_Visibility_API
 * table / data grid for document list - sortable columns, last modified
     * Draggable divider between doc list and editor?
 * app cache manifest!
@@ -50,6 +52,7 @@ code is here, at least!
 * HTML notes?
     * Option to switch from txt to html
     * Need an HTML editor - ie. markdown w/ preview, ckeditor, markitup, etc
+* restrict characters accepted for titles, some are inappropriate for filenames (eg. "/")
 * other storage drivers
     * Amazon S3 (cors?)
     * Google Drive

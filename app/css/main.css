@@ -94,6 +94,18 @@ article.intro img.logo {
     background-color: #dddddd;
     cursor: pointer;
 }
+#main-ui .rename {
+    position: absolute;
+    z-index: 10;
+    background: #fff url(../img/document.svg) no-repeat 6px 6px;
+    background-size: 16px;
+    border: 0;
+    margin: 0;
+    padding: 0.25em 0.25em 0.25em 30px;
+    font-family: inherit;
+    font-size: 1.285em;
+    line-height: 1.25em;
+}
 #main-ui .note { 
     margin: 0; padding: 0;
     position: absolute; 
